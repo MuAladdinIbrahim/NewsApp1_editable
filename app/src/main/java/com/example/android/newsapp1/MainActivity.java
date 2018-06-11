@@ -6,11 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +28,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<List<NewsModel>> {
 
     RecyclerView recyclerView;
+    SwipeRefreshLayout refreshLayout;
     NewsAdapter newsAdapter;
     ArrayList<NewsModel> newsList;
     private TextView mEmptyStateTextView;
@@ -42,20 +43,41 @@ public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+         // SwipeToRefresh
+        final SwipeRefreshLayout refreshLayout = findViewById(R.id.swipeRefresh);
+        refreshLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW);
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+            }
+        });
 
-        mEmptyStateTextView = findViewById(R.id.empty_view);
+        mEmptyStateTextView =findViewById(R.id.empty_view);
         recyclerView = findViewById(R.id.recyclerView);
-        loadingBar = findViewById(R.id.loading_bar);
+        loadingBar= findViewById(R.id.loading_bar);
 
         newsList = new ArrayList<>();
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        newsAdapter = new NewsAdapter(this, newsList);
+        newsAdapter = new NewsAdapter( this, newsList);
         recyclerView.setAdapter(newsAdapter);
-
+// refresh
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                int topRowVerticalPosition =
+                        (recyclerView == null || recyclerView.getChildCount() == 0) ? 0 : recyclerView.getChildAt(0).getTop();
+                refreshLayout.setEnabled(topRowVerticalPosition >= 0);
+            }
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+        
         // ConnectivityManager - check connection to internet (get info about connection of not null)
-        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr != null ? connMgr.getActiveNetworkInfo() : null;
 
         if (networkInfo != null && networkInfo.isConnected()) {
@@ -69,31 +91,43 @@ public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<
             loadingBar.setVisibility(View.GONE);
             mEmptyStateTextView.setText(R.string.no_connection);
         }
-
-        SwipeRefreshLayout swipeLayout =  findViewById(R.id.refreshview);
-// implement refresh listener
-        swipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-
-            @Override
-            public void onRefresh() {
-
-                // call this method for repopulating recycler view with new data
-                refreshRecyclerView();
-            }
-        });
-    }
-    private void refreshRecyclerView() {
-
-        // Handler to show refresh for a period of time you can use async task
-        // while commnunicating serve
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-            }
-        }, 5000);
     }
 
+
+    // refresh
+//    @Override
+//    protected void onCreate(final Bundle savedInstanceState)
+//    {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_main);
+//        final SwipeRefreshLayout swipeRefreshLayout= findViewById(R.id.swipeRefresh);
+//        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
+//        {
+//            @Override
+//            public void onRefresh()
+//            {
+//                refreshContent();
+//            }
+//        });
+//    }
+
+//    mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//        @Override
+//        public void onRefresh() {
+//            // Refresh items
+//            refreshItems();
+//        }
+//    });
+//
+//    void refreshItems() {
+//
+//        onItemsLoadComplete();
+//    }
+//
+//    void onItemsLoadComplete() {
+//        // Stop refresh animation
+//        mSwipeRefreshLayout.setRefreshing(false);
+//    }
 
     @Override
     // onCreateLoader instantiates and returns a new Loader for the given ID
