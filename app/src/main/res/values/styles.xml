@@ -62,4 +62,11 @@
         <item name="android:layout_centerInParent">true</item>
         <item name="android:paddingLeft">@dimen/padding</item>
     </style>
+
+    <style name="text" parent="AppTheme">
+        <item name="android:layout_margin">@dimen/small_margin</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">@dimen/divider_size</item>
+        <item name="android:textColor">@color/text_color</item>
+    </style>
 </resources>

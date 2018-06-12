@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<
             "http://content.guardianapis.com/search?show-tags=contributor&api-key=8d158f50-c87b-451a-8cd6-eb6fad30df86";
     private static final int LOADER_NEWS_ID = 1;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +61,10 @@ public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         newsAdapter = new NewsAdapter( this, newsList);
         recyclerView.setAdapter(newsAdapter);
+        //Malgoska
+        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+       // prefs.registerOnSharedPreferenceChangeListener((SharedPreferences.OnSharedPreferenceChangeListener) this);
+
 // refresh
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
             @Override
@@ -75,7 +78,7 @@ public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<
                 super.onScrollStateChanged(recyclerView, newState);
             }
         });
-        
+
         // ConnectivityManager - check connection to internet (get info about connection of not null)
         ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr != null ? connMgr.getActiveNetworkInfo() : null;
@@ -92,41 +95,56 @@ public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<
             mEmptyStateTextView.setText(R.string.no_connection);
         }
     }
-
-
-    // refresh
+//Malgoska
 //    @Override
-//    protected void onCreate(final Bundle savedInstanceState)
-//    {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
-//        final SwipeRefreshLayout swipeRefreshLayout= findViewById(R.id.swipeRefresh);
-//        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
-//        {
-//            @Override
-//            public void onRefresh()
-//            {
-//                refreshContent();
-//            }
-//        });
-//    }
-
-//    mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-//        @Override
-//        public void onRefresh() {
-//            // Refresh items
-//            refreshItems();
+//    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+//        if (key.equals(getString(R.string.settings_min_magnitude_key)) ||
+//                key.equals(getString(R.string.settings_order_by_key))) {
+//            // Clear the list for new query
+//            newsAdapter.clearAllData();
+//
+//            // Hide the empty state text view as the loading indicator will be displayed
+//            mEmptyStateTextView.setVisibility(View.GONE);
+//
+//            // Show the loading bar while new data is being fetched
+//            View loadingIndicator = findViewById(R.id.loading_bar);
+//            loadingIndicator.setVisibility(View.VISIBLE);
+//
+//            // Restart the loader to requery the news
+//            getLoaderManager().restartLoader(LOADER_NEWS_ID, null, this);
 //        }
-//    });
-//
-//    void refreshItems() {
-//
-//        onItemsLoadComplete();
 //    }
+////Malgoska
+//    @Override
+//    public Loader<List<NewsModel>> onCreateLoader(int i, Bundle bundle) {
 //
-//    void onItemsLoadComplete() {
-//        // Stop refresh animation
-//        mSwipeRefreshLayout.setRefreshing(false);
+//        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+//
+//        // getString from sharedPreferences
+//        String newsLimitNumber = sharedPrefs.getString(
+//                getString(R.string.settings_min_magnitude_key),
+//                getString(R.string.settings_min_magnitude_default));
+//        String newsTopic = sharedPrefs.getString(
+//                getString(R.string.settings_order_by_key),
+//                getString(R.string.settings_order_by_default));
+//
+//        // parse breaks apart the URI string that's passed into its parameter
+//        Uri baseUri = Uri.parse(Guardian_REQUEST_URL);
+//
+//        // buildUpon prepares the baseUri that we just parsed so we can add query parameters to it
+//        Uri.Builder uriBuilder = baseUri.buildUpon();
+//
+//        // Append query parameter and its value.
+//        if (!newsTopic.equals("all"))
+//            uriBuilder.appendQueryParameter(getString(R.string.settings_order_by_key), newsTopic);
+//        if (!newsLimitNumber.isEmpty())
+//            uriBuilder.appendQueryParameter(getString(R.string.settings_min_magnitude_key), newsLimitNumber);
+//
+//        uriBuilder.appendQueryParameter(getString(R.string.show_tags_author_key), getString(R.string.show_tags_author_value));
+//       // uriBuilder.appendQueryParameter(getString(R.string.api_key), getString(R.string.api_key_value));
+//
+//        // Return the completed uri
+//        return new NewsLoader(this, uriBuilder.toString());
 //    }
 
     @Override
@@ -151,10 +169,10 @@ public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<
         // buildUpon prepares the baseUri that we just parsed so we can add query parameters to it
         Uri.Builder uriBuilder = baseUri.buildUpon();
 
-        // Append query parameter and its value. For example, the `format=politics`
+        // Append query parameter and its value. For example,
         uriBuilder.appendQueryParameter("format", "json");
-        uriBuilder.appendQueryParameter("q", orderBy);
-        uriBuilder.appendQueryParameter("pageSize", minMagnitude);
+        uriBuilder.appendQueryParameter("page-size", minMagnitude);
+        uriBuilder.appendQueryParameter(getString(R.string.settings_order_by_key),orderBy);
 
         return new NewsLoader(this, uriBuilder.toString());
     }
@@ -162,7 +180,7 @@ public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<
     //what happens when the loading finished
     @Override
     public void onLoadFinished(Loader<List<NewsModel>> loader, List<NewsModel> myNewsList) {
-
+        View loadingBar = findViewById(R.id.loading_bar);
         loadingBar.setVisibility(View.GONE);
         mEmptyStateTextView.setText(R.string.no_content);
         newsAdapter.clearAllData();
