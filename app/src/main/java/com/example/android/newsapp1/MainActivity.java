@@ -61,10 +61,6 @@ public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         newsAdapter = new NewsAdapter( this, newsList);
         recyclerView.setAdapter(newsAdapter);
-        //Malgoska
-        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-       // prefs.registerOnSharedPreferenceChangeListener((SharedPreferences.OnSharedPreferenceChangeListener) this);
-
 // refresh
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
             @Override
@@ -95,57 +91,6 @@ public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<
             mEmptyStateTextView.setText(R.string.no_connection);
         }
     }
-//Malgoska
-//    @Override
-//    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-//        if (key.equals(getString(R.string.settings_min_magnitude_key)) ||
-//                key.equals(getString(R.string.settings_order_by_key))) {
-//            // Clear the list for new query
-//            newsAdapter.clearAllData();
-//
-//            // Hide the empty state text view as the loading indicator will be displayed
-//            mEmptyStateTextView.setVisibility(View.GONE);
-//
-//            // Show the loading bar while new data is being fetched
-//            View loadingIndicator = findViewById(R.id.loading_bar);
-//            loadingIndicator.setVisibility(View.VISIBLE);
-//
-//            // Restart the loader to requery the news
-//            getLoaderManager().restartLoader(LOADER_NEWS_ID, null, this);
-//        }
-//    }
-////Malgoska
-//    @Override
-//    public Loader<List<NewsModel>> onCreateLoader(int i, Bundle bundle) {
-//
-//        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-//
-//        // getString from sharedPreferences
-//        String newsLimitNumber = sharedPrefs.getString(
-//                getString(R.string.settings_min_magnitude_key),
-//                getString(R.string.settings_min_magnitude_default));
-//        String newsTopic = sharedPrefs.getString(
-//                getString(R.string.settings_order_by_key),
-//                getString(R.string.settings_order_by_default));
-//
-//        // parse breaks apart the URI string that's passed into its parameter
-//        Uri baseUri = Uri.parse(Guardian_REQUEST_URL);
-//
-//        // buildUpon prepares the baseUri that we just parsed so we can add query parameters to it
-//        Uri.Builder uriBuilder = baseUri.buildUpon();
-//
-//        // Append query parameter and its value.
-//        if (!newsTopic.equals("all"))
-//            uriBuilder.appendQueryParameter(getString(R.string.settings_order_by_key), newsTopic);
-//        if (!newsLimitNumber.isEmpty())
-//            uriBuilder.appendQueryParameter(getString(R.string.settings_min_magnitude_key), newsLimitNumber);
-//
-//        uriBuilder.appendQueryParameter(getString(R.string.show_tags_author_key), getString(R.string.show_tags_author_value));
-//       // uriBuilder.appendQueryParameter(getString(R.string.api_key), getString(R.string.api_key_value));
-//
-//        // Return the completed uri
-//        return new NewsLoader(this, uriBuilder.toString());
-//    }
 
     @Override
     // onCreateLoader instantiates and returns a new Loader for the given ID
