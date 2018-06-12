@@ -25,7 +25,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<List<NewsModel>> {
+public class MainActivity extends AppCompatActivity implements LoaderCallbacks<List<NewsModel>>, SharedPreferences.OnSharedPreferenceChangeListener {
+
 
     RecyclerView recyclerView;
     SwipeRefreshLayout refreshLayout;
@@ -61,6 +62,9 @@ public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         newsAdapter = new NewsAdapter( this, newsList);
         recyclerView.setAdapter(newsAdapter);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
 // refresh
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener(){
             @Override
@@ -89,6 +93,26 @@ public class MainActivity extends AppCompatActivity  implements LoaderCallbacks<
             //If have not connection with internet
             loadingBar.setVisibility(View.GONE);
             mEmptyStateTextView.setText(R.string.no_connection);
+        }
+    }
+
+    //Restart MainActivity after Changing preference
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+        if (key.equals(getString(R.string.settings_min_magnitude_key)) ||
+                key.equals(getString(R.string.settings_order_by_key))) {
+            // Clear the list for new query
+            newsAdapter.clearAllData();
+
+            // Hide the empty state text view as the loading indicator will be displayed
+            mEmptyStateTextView.setVisibility(View.GONE);
+
+            // Show the loading bar while new data is being fetched
+            View loadingBar = findViewById(R.id.loading_bar);
+            loadingBar.setVisibility(View.VISIBLE);
+
+            // Restart the loader to requery the news
+            getLoaderManager().restartLoader(LOADER_NEWS_ID, null, this);
         }
     }
 
